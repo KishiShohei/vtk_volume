@@ -17,25 +17,18 @@ module mesh_m
 
         contains
 
-        procedure :: read => read_UnstructuredGrid_inVTK
-        procedure :: output => output_UnstructuredGrid_inVTK
+        procedure :: read_UnstructuredGrid_inVTK
+        procedure :: output_UnstructuredGrid_inVTK
         procedure get_numCell, get_numNode, get_nodeCoordinate, get_cellVertices
         procedure set_nodeCoordinate, set_cellVertices
+        procedure calculate_volume
 
     end type
 
-    public UnstructuredGrid_inVTK_
 
     contains
 
-    type(UnstructuredGrid_inVTK) function UnstructuredGrid_inVTK_(cdn, vertices, types)
-        real, intent(in) :: cdn(:,:)
-        integer, intent(in) :: vertices(:,:), types(:)
 
-        call UnstructuredGrid_inVTK_%set_nodeCoordinate(cdn)
-        call UnstructuredGrid_inVTK_%set_cellVertices(vertices, types)
-
-    end function
 
     subroutine read_UnstructuredGrid_inVTK(self, FNAME, action, cellScalar, cellVector)
         class(UnstructuredGrid_inVTK) self
@@ -90,6 +83,47 @@ module mesh_m
             end if 
 
     end subroutine        
+
+    subroutine calculate_volume(self)
+        class(UnstructuredGrid_inVTK) self
+        real t1,t2,t3,h1,h2,h3,pr1,pr2,pr3,py1,py2,py3
+        real volume_tetra , volume_hexa , volume_prism , volume_pyramid
+        t1 = self%node_array(self%cell_array(1)%nodeID(2))%coordinate(1) &
+        - self%node_array(self%cell_array(1)%nodeID(1))%coordinate(1)
+        t2 = self%node_array(self%cell_array(1)%nodeID(3))%coordinate(2) &
+        - self%node_array(self%cell_array(1)%nodeID(1))%coordinate(2)
+        t3 = self%node_array(self%cell_array(1)%nodeID(4))%coordinate(3) &
+        - self%node_array(self%cell_array(1)%nodeID(1))%coordinate(3)
+        volume_tetra = t1*t2*t3/6
+        h1 = self%node_array(self%cell_array(2)%nodeID(2))%coordinate(1) &
+        - self%node_array(self%cell_array(2)%nodeID(1))%coordinate(1)
+        h2 = self%node_array(self%cell_array(2)%nodeID(4))%coordinate(2) &
+        - self%node_array(self%cell_array(2)%nodeID(1))%coordinate(2)
+        h3 = self%node_array(self%cell_array(2)%nodeID(5))%coordinate(3) &
+        - self%node_array(self%cell_array(2)%nodeID(1))%coordinate(3)
+        volume_hexa = h1*h2*h3 
+        pr1 = self%node_array(self%cell_array(3)%nodeID(3))%coordinate(2) &
+        - self%node_array(self%cell_array(3)%nodeID(1))%coordinate(2)
+        pr2 = self%node_array(self%cell_array(3)%nodeID(4))%coordinate(3) &
+        - self%node_array(self%cell_array(3)%nodeID(1))%coordinate(3)
+        pr3 = self%node_array(self%cell_array(3)%nodeID(2))%coordinate(1) &
+        - self%node_array(self%cell_array(3)%nodeID(1))%coordinate(1)
+        volume_prism = pr1*pr2*pr3/2
+        py1 = self%node_array(self%cell_array(4)%nodeID(2))%coordinate(1) &
+        - self%node_array(self%cell_array(4)%nodeID(1))%coordinate(1)
+        py2 = self%node_array(self%cell_array(4)%nodeID(4))%coordinate(2) &
+        - self%node_array(self%cell_array(4)%nodeID(1))%coordinate(2)
+        py3 = self%node_array(self%cell_array(4)%nodeID(5))%coordinate(3) &
+        - self%node_array(self%cell_array(4)%nodeID(1))%coordinate(3)
+        volume_pyramid = py1*py2*py3/3
+
+
+        print*,"volume_tetra=", volume_tetra
+        print*,"volume_hexa=", volume_hexa
+        print*,"volume_prism=", volume_prism
+        print*,"volume_pyramid=", volume_pyramid
+
+    end subroutine
 
     subroutine output_UnstructuredGrid_inVTK(self, FNAME, cellScalar, cellVector, scalarName, vectorName)
         class(UnstructuredGrid_inVTK) self
@@ -213,19 +247,4 @@ module mesh_m
     
         end subroutine   
         
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-end module mesh_m
+end module 
