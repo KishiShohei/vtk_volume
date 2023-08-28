@@ -68,6 +68,7 @@ module mesh_m
         real V_tetra, V_hexa, V_tr_prism, V_quad_prism, A, B, C, D, E, F, G, H, I, J, K, L
 
         A=norm2(self%nodes(self%cells(1)%nodeID(2))%coordinate - self%nodes(self%cells(1)%nodeID(1))%coordinate)
+        !self%cells(1)%nodeID(2)が2を返す→self%nodes(2)%coordinateで2番の座標となる。
         B=norm2(self%nodes(self%cells(1)%nodeID(3))%coordinate - self%nodes(self%cells(1)%nodeID(1))%coordinate)
         C=norm2(self%nodes(self%cells(1)%nodeID(4))%coordinate - self%nodes(self%cells(1)%nodeID(1))%coordinate)
         V_tetra = A*B*C/(2*3)
@@ -86,7 +87,7 @@ module mesh_m
         K=norm2(self%nodes(self%cells(4)%nodeID(4))%coordinate - self%nodes(self%cells(4)%nodeID(1))%coordinate)
         L=norm2(self%nodes(self%cells(4)%nodeID(5))%coordinate - self%nodes(self%cells(4)%nodeID(1))%coordinate)
         V_quad_prism = J*K*L/3
-        print*, "V_quad_prism = ", V_quad_prism
+        print*, "V_quad_prism = ", V_quad_prism 
     end subroutine
 
     subroutine output_vtk(self)
